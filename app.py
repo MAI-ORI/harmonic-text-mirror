@@ -1,30 +1,60 @@
 import streamlit as st
-from harmonic_text_mapping import classify_word
-from xrpl.clients import JsonRpcClient
-from xrpl.wallet import Wallet
-from xrpl.models.requests import AccountLines
+import requests
+from harmonic_text_mapping import word_value, classify_word, english_mapping
 
 # --- CONFIGURATION ---
-# Replace with your actual XRPL Issuing Address and Token Code
-ISSUER_ADDRESS = "rYourIssuingAddressHere"
-TOKEN_CODE = "HTM"  # Harmonic Text Mirror Token
-XRPL_NODE = "https://s.altnet.rippletest.net:51234"  # Testnet
+# Replace with your actual XRPL Issuing Address
+ISSUER_ADDRESS = "your_issuer_wallet_address"  
+PI_TOKEN_CODE = "Pi"
+SHAIDS_TOKEN_CODE = "SHAIDS"
+XRPL_NODE = "https://s1.ripple.com:51234"  # Mainnet (use testnet if testing)
 
 # --- HELPER FUNCTIONS ---
-def check_token_balance(user_address):
-    """Checks if the user holds the required HTM token on XRPL."""
+def verify_user_tokens(wallet_address):
+    """
+    Queries the XRP Ledger to verify if the user holds Pi or SHAIDS tokens.
+    """
+    payload = {
+        "method": "account_lines",
+        "params": [
+            {
+                "account": wallet_address,
+                "ledger_index": "validated"
+            }
+        ]
+    }
+
     try:
-        client = JsonRpcClient(XRPL_NODE)
-        request = AccountLines(account=user_address)
-        response = client.request(request)
-        
-        lines = response.result.get("lines", [])
-        for line in lines:
-            if line["account"] == ISSUER_ADDRESS and line["currency"] == TOKEN_CODE:
-                return float(line["balance"]) > 0
+        response = requests.post(XRPL_NODE, json=payload)
+        data = response.json()
+
+        if "result" in data and "lines" in data["result"]:
+            lines = data["result"]["lines"]
+            has_pi = False
+            has_shaids = False
+
+            for line in lines:
+                currency = line.get("currency")
+                issuer = line.get("account")
+                balance = float(line.get("balance", 0))
+
+                # Check for Pi Token
+                if currency == PI_TOKEN_CODE and issuer == ISSUER_ADDRESS and balance > 0:
+                    has_pi = True
+
+                # Check for SHAIDS Token
+                if currency == SHAIDS_TOKEN_CODE and issuer == ISSUER_ADDRESS and balance > 0:
+                    has_shaids = True
+
+            return {
+                "verified": has_pi or has_shaids,
+                "pi_balance": has_pi,
+                "shaids_balance": has_shaids
+            }
+
     except Exception as e:
         st.error(f"XRPL Connection Error: {e}")
-    return False
+        return {"verified": False, "pi_balance": False, "shaids_balance": False}
 
 # --- STREAMLIT UI ---
 st.title("✦ Harmonic Text Mirror")
@@ -36,58 +66,36 @@ if "authenticated" not in st.session_state:
 
 if not st.session_state.authenticated:
     st.subheader("🔑 Access Verification")
-    st.write("Please enter your XRPL wallet address to verify your HTM token.")
+    st.write("Please enter your XRPL wallet address to verify your Pi or SHAIDS token.")
     
     user_wallet = st.text_input("XRPL Wallet Address")
     
     if st.button("Verify Token"):
-        if check_token_balance(user_wallet):
+        verification = verify_user_tokens(user_wallet)
+        if verification["verified"]:
             st.session_state.authenticated = True
             st.success("Access Granted! Harmonic field unlocked.")
             st.rerun()
         else:
-            st.error("Token not found. Please ensure you hold HTM tokens from the correct issuer.")
+            st.error("Token not found. Please ensure you hold Pi or SHAIDS tokens from the correct issuer.")
 else:
     # --- MAIN APP CONTENT ---
     st.subheader("Mirror Active")
     
-    # Alphabet Mapping
-    alphabet_mapping = {char: i % 9 or 9 for i, char in enumerate("abcdefghijklmnopqrstuvwxyz", 1)}
-    
-    user_input = st.text_input("Enter a word or phrase:")
+    user_input = st.text_area("Your Text:")
     
     if user_input:
         words = user_input.split()
-        results = [classify_word(word, alphabet_mapping) for word in words]
-        
-        for res in results:
-            st.write(f"**{res['word']}** | Sum: {res['sum']} | Digital Root: {res['digital_root']}")
+        results = []
+        for word in words:
+            val = word_value(word, english_mapping)
+            category = classify_word(val)
+            results.append((word, val, category))
+
+        st.write("### Results:")
+        for word, val, cat in results:
+            st.write(f"**{word}** | Value: {val} | Category: {cat}")
             
     if st.button("Lock Session"):
         st.session_state.authenticated = False
         st.rerun()
-import streamlit as st
-from xrpl_integration import get_account_info
-
-st.title("Harmonic Text Mirror")
-
-# --- XRP Token Integration Section ---
-st.sidebar.header("✦ XRP Wallet Connection")
-wallet_address = st.sidebar.text_input("Enter your XRP Wallet Address:")
-
-if wallet_address:
-    st.sidebar.write("Connecting to XRP Ledger...")
-    account_data = get_account_info(wallet_address)
-    
-    if "error" in account_data:
-        st.sidebar.error("Invalid address or account not found.")
-    else:
-        balance_drops = int(account_data["account_data"]["Balance"])
-        balance_xrp = balance_drops / 1,000,000  # Convert drops to XRP
-        st.sidebar.success(f"Connected!")
-        st.sidebar.write(f"**Balance:** {balance_xrp:.2f} XRP")
-        
-        # Optional: Check for your custom token
-        # is_holder = verify_token_holder(wallet_address, "YOUR_TOKEN_CODE", "ISSUER_ADDRESS")
-        # if is_holder:
-        #     st.sidebar.write("✅ Harmonic Token Verified")
