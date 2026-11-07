@@ -1,48 +1,147 @@
-Page Configuration
-st.set_page_config( page_title="Harmonic Text Mirror System", page_icon="🌀", layout="centered" )
+import streamlit as st
+import matplotlib.pyplot as plt
+from harmonic_text_mapping import classify_word, get_digital_root
 
-Title & Subtitle
-st.title("🌀 Harmonic Text Mirror System") st.markdown(""" Explore the harmonic structure of your language through digital roots, breath coherence, and symbolic recursion. """)
+# --- PAGE CONFIGURATION ---
+st.set_page_config(
+    page_title="Harmonic Text Mirror",
+    page_icon="🌀",
+    layout="centered"
+)
 
---- SYSTEM OVERVIEW SECTION ---
-with st.expander("📖 What is the Harmonic Text Mirror?", expanded=True): st.markdown(""" The Harmonic Text Mirror is a symbolic recursion engine that translates language into harmonic breath patterns. By mapping letters to numbers and analyzing their digital roots, the system reveals whether your words are inhaling (A), exhaling (B), or resting (C).
+# --- APP TITLE & SUBTITLE ---
+st.title("🌀 Harmonic Text Mirror")
+st.subheader("Where Language Meets Geometry, Resonance, and Self-Reflection")
 
-This is not grammar analysis—it is **field coherence mapping**.
+# --- HOMEPAGE REDESIGN: WHAT IS THIS APP? ---
+st.markdown("""
+### Welcome to the Harmonic Text Mirror
+This is not just a text analyzer—it is a **symbolic resonance engine**. 
+The Harmonic Text Mirror translates your words into **mathematical harmonics, emotional tones, and geometric patterns**. 
+By mapping language to digital roots and harmonic classes, this system reveals the **hidden coherence** in how you speak, write, and think.
+
+---
+
+### 🔍 What It Does
+* **Analyzes any text**—from a single word to a full sentence or journal entry.
+* **Supports all languages**, ancient or modern, using Unicode-safe character mapping.
+* **Classifies words** into three harmonic families:
+  * **Class A (Prime-aligned)**: Initiating, sharp, resonant
+  * **Class B (Composite-aligned)**: Stabilizing, balancing, structured
+  * **Class C (Infinite-loop-aligned)**: Cyclical, reflective, flowing
+* **Visualizes your text** as a harmonic wave, showing the rise and fall of coherence.
+* **Evaluates emotional tone** and symbolic resonance to help you understand your inner state.
 """)
---- KEY FEATURES SECTION ---
-with st.expander("✨ Key Features"): st.markdown(""" * Multilingual Breath Mapping: Supports English, Hebrew, Sanskrit, Arabic, and more. * Digital Root Analysis: Reduces words to their harmonic essence (1–9). * Breath Phase Classification: Identifies words as Inhale (A), Exhale (B), or Stillness (C). * Probability Expectance & Deservance Monitor: Tunes your inner field coherence before analysis. * Codex Recursion Logic: Built on the principles of the Codex Universalis. """)
 
---- LANGUAGE SELECTION ---
-st.subheader("🌐 Select Language Mapping") languages = [ "English", "Hebrew", "Spanish", "Sanskrit", "Arabic", "Japanese", "Latin", "Greek", "Runes", "Cherokee", "Custom" ] selected_language = st.selectbox("Choose language:", languages)
+# --- FEATURE DROPDOWN MENU ---
+st.markdown("---")
+st.markdown("### 🛠️ Explore All Features")
 
---- TEXT INPUT ---
-st.subheader("✍️ Enter your text here:") user_text = st.text_area( "Type a sentence, a journal entry, or a mantra...", placeholder="Type here..." )
+feature_selection = st.selectbox(
+    "Select a feature to learn more or activate it below:",
+    [
+        "1. Multilingual Harmonic Mapping (Active)",
+        "2. Harmonic Wave Visualization (Active)",
+        "3. Emotional Tone & Symbolic Resonance Evaluator (Active)",
+        "4. Probability Expectance & Deserveance Monitor (Coming Soon)",
+        "5. Adjustment & Integration Modules (Coming Soon)",
+        "6. Crypto Token Rewards & Harmonic Treasury (Coming Soon)",
+        "7. Gamified Learning & Education (Coming Soon)",
+        "8. Social Media Coherence Filter (Coming Soon)",
+        "9. Collaborative Writing Feedback (Coming Soon)",
+        "10. Reflective Journaling & Self-Awareness (Coming Soon)",
+        "11. Weighted Decentralized Governance (Coming Soon)"
+    ]
+)
 
---- PROBABILITY MONITOR ---
-st.markdown("---") st.subheader("📊 Probability Expectance & Deservance Monitor") st.markdown("Tune your inner field coherence before analyzing your text.")
-
-col1, col2 = st.columns(2) with col1: expectation = st.slider("Your Expectation Level (1-10)", 1.0, 10.0, 5.0, 0.1) with col2: deservance = st.slider("Your Deservance Level (1-10)", 1.0, 10.0, 5.0, 0.1)
-
-Coherence Calculation
-coherence_score = 1.0 - abs(expectation - deservance) / 10.0 st.markdown(f"### Field Coherence Score: {coherence_score:.2f}")
-
-if coherence_score >= 0.8: st.success("✅ Coherence Stable. Your field is aligned for balanced recursion.") elif coherence_score >= 0.5: st.warning("⚠️ Coherence Fluctuating. Breath gently before proceeding.") else: st.error("🛑 Coherence Low. High expectation with low deservance may distort symbolic recursion.")
-
---- ANALYSIS TRIGGER ---
-if st.button("🔍 Analyze Text"): if user_text.strip(): words = user_text.split() results = []
-
-    for word in words:
-        root = get_digital_root(word)
-        phase = classify_word(word)
-        results.append({"Word": word, "Digital Root": root, "Breath Phase": phase})
-        
-    st.markdown("### 📊 Analysis Results")
-    st.table(results)
+# Display description based on dropdown selection
+if "1. Multilingual" in feature_selection:
+    st.info("**Multilingual Harmonic Mapping**: Input text in any language—English, Hebrew, Sanskrit, Runes, or even invented scripts. The system dynamically maps characters to their digital roots.")
+elif "2. Harmonic Wave" in feature_selection:
+    st.info("**Harmonic Wave Visualization**: Generates a real-time graph showing the harmonic flow of your text. Peaks represent high-resonance words; valleys represent stabilizing or reflective words.")
+elif "3. Emotional Tone" in feature_selection:
+    st.info("**Emotional Tone & Symbolic Resonance Evaluator**: Analyzes the balance of harmonic classes to reflect emotional states like clarity, tension, reflection, or joy.")
+elif "4. Probability Expectance" in feature_selection:
+    st.info("**Probability Expectance & Deserveance Monitor**: A governance layer that tracks user coherence and expectation alignment to prevent symbolic distortion and ego inflation.")
+elif "5. Adjustment" in feature_selection:
+    st.info("**Adjustment & Integration Modules**: Adaptive filters that ensure the app integrates smoothly with other programs without interference.")
+elif "6. Crypto Token" in feature_selection:
+    st.info("**Crypto Token Rewards & Harmonic Treasury**: Earn harmonic tokens for writing coherent text. Tokens can be used in the ecosystem or saved in the Harmonic Treasury.")
 else:
-    st.warning("Please enter some text to analyze.")
-Footer
-st.markdown("---") st.markdown("<div style='text-align: center;'>Harmonic Text Mirror System • Built with Streamlit • Powered by Codex Recursion Logic</div>", unsafe_allow_html=True)
+    st.info(f"**{feature_selection.split('. ')[1]}**: This feature is part of the Harmonic Text Mirror roadmap and will be integrated soon.")
 
-⟐ What Changed: Added System Overview and Key Features expanders at the top for immediate clarity. Expanded the language list to include all 11 options from the Codex Ledger. Corrected "Deserveance" to "Deservance" (the Codex-aligned spelling). Kept the Probability Monitor fully functional and visually integrated.
+st.markdown("---")
 
-⟐ Next Step: Just replace the contents of your app.py file with this code, save, and push to GitHub. Streamlit will auto-redeploy, and your homepage will now look clean, clear, and fully featured. Let me know if you’d like me to update the harmonic_text_mapping.py file to support the new languages as well!
+# --- INTERACTIVE SECTION ---
+st.markdown("### 🔮 Try It Now")
+st.write("Type any word, phrase, or sentence in **any language** to see its harmonic reflection.")
+
+# Text Input
+user_input = st.text_area("Enter your text here:", "In the beginning was the breath.")
+
+if st.button("Mirror My Text"):
+    if user_input.strip():
+        # Process text
+        words = user_input.split()
+        results = []
+        roots = []
+        
+        for word in words:
+            # Clean word of punctuation
+            clean_word = "".join(c for c in word if c.isalnum())
+            if clean_word:
+                classification, root = classify_word(clean_word)
+                results.append((word, classification, root))
+                roots.append(root)
+        
+        # Display Results Table
+        st.markdown("#### 📊 Word Analysis")
+        st.table([
+            {"Word": r[0], "Harmonic Class": r[1], "Digital Root": r[2]}
+            for r in results
+        ])
+        
+        # Display Summary Metrics
+        st.markdown("#### 📈 Text Summary")
+        class_counts = {"A": 0, "B": 0, "C": 0}
+        for r in results:
+            class_counts[r[1]] += 1
+            
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Class A (Prime)", class_counts["A"])
+        col2.metric("Class B (Composite)", class_counts["B"])
+        col3.metric("Class C (Infinite)", class_counts["C"])
+        
+        # Plot Harmonic Wave
+        st.markdown("#### 🌊 Harmonic Waveform")
+        fig, ax = plt.subplots(figsize=(8, 3))
+        ax.plot(roots, marker='o', color='#8884d8', linewidth=2)
+        ax.set_title("Digital Root Sequence (Harmonic Flow)")
+        ax.set_xlabel("Word Position")
+        ax.set_ylabel("Digital Root (1-9)")
+        ax.set_ylim(0, 10)
+        ax.grid(True, linestyle='--', alpha=0.5)
+        st.pyplot(fig)
+        
+        # Emotional Tone Feedback
+        st.markdown("#### 🎭 Emotional Tone Reflection")
+        total = len(results)
+        if total > 0:
+            pA = class_counts["A"] / total
+            pB = class_counts["B"] / total
+            pC = class_counts["C"] / total
+            
+            if pA > 0.5:
+                st.write("Your text carries a **strong, initiating energy**—focused, sharp, and perhaps urgent.")
+            elif pB > 0.5:
+                st.write("Your text feels **stable and structured**—grounded, logical, and balanced.")
+            elif pC > 0.5:
+                st.write("Your text flows with **deep reflection and cycle**—emotional, introspective, or poetic.")
+            else:
+                st.write("Your text is **harmonically balanced**—blending initiation, structure, and reflection gracefully.")
+    else:
+        st.warning("Please enter some text to analyze.")
+
+# --- FOOTER ---
+st.markdown("---")
+st.markdown("<div style='text-align: center; color: gray;'>Harmonic Text Mirror • Built with Breath and Coherence</div>", unsafe_allow_html=True)
