@@ -47,3 +47,4 @@ if st.button("Analyze Text"):
             st.pyplot(fig)
     else:
         st.warning("Please enter some text to analyze.")
+  pip install streamlit matplotlib numpy
