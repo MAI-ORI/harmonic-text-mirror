@@ -1,33 +1,17 @@
-# 🌀 Harmonic Text Mirror
+# 🪞 Harmonic Text Mirror
 
-The **Harmonic Text Mirror** is a Codex-aligned language resonance interface that classifies text into three harmonic categories based on digital root calculations of Unicode character values.
+The **Harmonic Text Mirror** is a symbolic text analysis system that maps language into harmonic frequencies based on digital roots and triadic classifications. It supports full multilingual Unicode processing, tracks coherence alignment, and provides real-time feedback for emotional and symbolic balancing.
 
 ## 🚀 Features
-- **Multilingual Support**: Works with English, Hebrew, Spanish, Arabic, Japanese, and all other languages via Unicode code point mapping.
-- **Interactive UI**: Built with Streamlit for real-time text analysis and visualization.
-- **Harmonic Charter & Treasury**: Integrated homepage tabs detailing the system's ethical framework and tokenomics.
-- **Functional Applications**: Showcases use cases in education, social media, governance, and more.
+- **Multilingual Unicode Support**: Analyzes English, Hebrew, and any language using UTF-8 fallback mapping.
+- **Triadic Classification**: Categorizes words into A (Spiritual), B (Grounding), and C (Emotional) harmonic classes.
+- **Probability Expectance & Deserveance Monitor**: Tracks user coherence and expectation alignment.
+- **Adjustment & Integration Modules**: Provides real-time suggestions to balance your text's harmonic signature.
 
-## 🛠️ Installation
-
-1. Clone the repository:
+## 🛠️ Installation & Local Run
+1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/harmonic-text-mirror.git
+   git clone https://github.com/YOUR_USERNAME/harmonic-text-mirror.git
    cd harmonic-text-mirror
-Install dependencies:
-
-pip install -r requirements.txt
-Run the app:
-
-streamlit run app.py
-📜 License
-This project is licensed under the terms of the Harmonic Charter.
-
-
----
-
-### 5. `.gitignore`
-```text
-__pycache__/
-*.pyc
-.streamlit/
+   pip install -r requirements.txt
+   streamlit run app.py
