@@ -80,3 +80,4 @@ else:
     if st.button("Analyze"):
         # Call your classification functions here
         st.write("Analyzing harmonic resonance...")
+pip install xrpl-py
