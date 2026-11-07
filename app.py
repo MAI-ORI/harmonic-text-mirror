@@ -99,3 +99,20 @@ else:
     if st.button("Lock Session"):
         st.session_state.authenticated = False
         st.rerun()
+classify_word
+# ... (previous code with imports and functions) ...
+
+# --- MAIN APP CONTENT ---
+st.subheader("Mirror Active")
+
+# Alphabet Mapping
+alphabet_mapping = {char: i % 9 or 9 for i, char in enumerate("abcdefghijklmnopqrstuvwxyz", 1)}
+
+user_input = st.text_input("Enter a word or phrase:")
+
+if user_input:
+    words = user_input.split()
+    results = [classify_word(word, alphabet_mapping) for word in words]
+
+    for res in results:
+        st.write(f"**{res['word']}** | Sum: {res['sum']} | Digital Root: {res['digital_root']}")
