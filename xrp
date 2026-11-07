@@ -1,0 +1,82 @@
+import streamlit as st
+from xrpl.clients import JsonRpcClient
+from xrpl.wallet import Wallet
+from xrpl.models.transactions import Payment
+from xrpl.transaction import submit_and_wait
+import time
+
+# --- XRPL Configuration ---
+# Use Testnet for development, Mainnet for production
+XRPL_URL = "https://s.altnet.rippletest.net:51234"
+client = JsonRpcClient(XRPL_URL)
+
+# Your app's receiving wallet address (replace with your actual address)
+RECEIVER_ADDRESS = "rPT182as1qmqg9TX9p8u4yTcgT9qaggzX"  # Testnet example
+
+# --- Payment Verification Function ---
+def verify_payment(sender_seed, amount_xrp):
+    try:
+        # Initialize sender wallet from seed
+        sender_wallet = Wallet.from_seed(sender_seed)
+        
+        # Convert XRP to drops (1 XRP = 1,000,000 drops)
+        amount_drops = str(int(amount_xrp * 1_000_000))
+        
+        # Create payment transaction
+        payment_tx = Payment(
+            account=sender_wallet.classic_address,
+            amount=amount_drops,
+            destination=RECEIVER_ADDRESS,
+        )
+        
+        # Submit transaction and wait for validation
+        response = submit_and_wait(payment_tx, client, sender_wallet)
+        
+        # Check if transaction was successful
+        if response.status == "success":
+            return True, response.result["hash"]
+        else:
+            return False, "Transaction failed."
+    except Exception as e:
+        return False, str(e)
+
+# --- Streamlit UI ---
+st.title("🔮 Harmonic Text Mirror")
+
+# Initialize session state for payment status
+if "payment_verified" not in st.session_state:
+    st.session_state.payment_verified = False
+
+# Payment Section
+if not st.session_state.payment_verified:
+    st.subheader("💳 Access Activation")
+    st.write("To use the Harmonic Text Mirror, please complete a one-time payment of **5 XRP**.")
+    
+    # Input for user's wallet seed (for testing purposes)
+    # In production, use a wallet connector like Xumm SDK for security
+    user_seed = st.text_input("Enter your XRPL Testnet Wallet Seed (Secret Key):", type="password")
+    
+    if st.button("Pay 5 XRP"):
+        if user_seed:
+            with st.spinner("Processing transaction on XRPL..."):
+                success, result = verify_payment(user_seed, 5)
+                if success:
+                    st.success(f"✅ Payment successful! Tx Hash: {result}")
+                    st.session_state.payment_verified = True
+                    time.sleep(2)
+                    st.rerun()
+                else:
+                    st.error(f"❌ Payment failed: {result}")
+        else:
+            st.warning("Please enter your wallet seed.")
+
+# Main App Section (Unlocked after payment)
+else:
+    st.success("🔓 App Unlocked")
+    st.write("Welcome to the Harmonic Text Mirror. Enter your text below to begin mapping.")
+    
+    # Your existing Harmonic Text Mapping code goes here
+    user_text = st.text_area("Enter text to analyze:")
+    if st.button("Analyze"):
+        # Call your classification functions here
+        st.write("Analyzing harmonic resonance...")
