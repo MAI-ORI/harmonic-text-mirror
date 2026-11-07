@@ -1,170 +1,210 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-from harmonic_text_mapping import process_sentence
+import numpy as np
+import re
 
-# Page configuration
-st.set_page_config(
-    page_title="Harmonic Text Mirror",
-    page_icon="🌀",
-    layout="centered"
-)
+# ==========================================
+# 1. CORE HARMONIC TEXT MIRROR LOGIC
+# ==========================================
 
-# Custom CSS for styling
-st.markdown("""
-    <style>
-    .main {
-        background-color: #0f0f1a;
-        color: #e0e0ff;
+# Alphabet mappings for digital root calculations
+ALPHABET_MAPPINGS = {
+    "English": {
+        'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9,
+        'j': 1, 'k': 2, 'l': 3, 'm': 4, 'n': 5, 'o': 6, 'p': 7, 'q': 8, 'r': 9,
+        's': 1, 't': 2, 'u': 3, 'v': 4, 'w': 5, 'x': 6, 'y': 7, 'z': 8
+    },
+    "Hebrew": {
+        'א': 1, 'ב': 2, 'ג': 3, 'ד': 4, 'ה': 5, 'ו': 6, 'ז': 7, 'ח': 8, 'ט': 9,
+        'י': 1, 'כ': 2, 'ל': 3, 'מ': 4, 'נ': 5, 'ס': 6, 'ע': 7, 'פ': 8, 'צ': 9,
+        'ק': 1, 'ר': 2, 'ש': 3, 'ת': 4
     }
-    h1, h2, h3 {
-        color: #a080ff;
-        font-family: 'Courier New', monospace;
-    }
-    .stButton>button {
-        background-color: #4b0082;
-        color: white;
-        border-radius: 8px;
-        border: 1px solid #a080ff;
-    }
-    .stButton>button:hover {
-        background-color: #6a0dad;
-        border-color: #d8b4fe;
-    }
-    .card {
-        background-color: #1a1a2e;
-        padding: 20px;
-        border-radius: 10px;
-        border: 1px solid #333355;
-        margin-bottom: 20px;
-    }
-    </style>
-    """, unsafe_allow_index=True)
+}
 
-# Title and Subtitle
-st.title("🌀 Harmonic Text Mirror")
-st.subheader("A Codex-aligned language resonance interface")
+def get_digital_root(n):
+    """Calculate the digital root of an integer."""
+    if n == 0:
+        return 0
+    return 9 if n % 9 == 0 else n % 9
 
-# Navigation Tabs
-tab1, tab2, tab3, tab4 = st.tabs(["Mirror Tool", "Harmonic Charter", "Treasury & Tokenomics", "Applications"])
+def classify_word(word, mapping):
+    """Calculate the digital root of a word based on the provided mapping."""
+    word_clean = re.sub(r'[^a-zA-Zא-ת]', '', word.lower())
+    if not word_clean:
+        return None
+    
+    total_value = sum(mapping.get(char, 0) for char in word_clean)
+    digital_root = get_digital_root(total_value)
+    
+    if digital_root in [3, 6, 9]:
+        return 'A'
+    elif digital_root in [1, 4, 7]:
+        return 'B'
+    elif digital_root in [2, 5, 8]:
+        return 'C'
+    return None
 
-# ================= TAB 1: MIRROR TOOL =================
-with tab1:
-    st.markdown("### Enter text to view its harmonic signature:")
-    user_input = st.text_area("Supports all languages (English, Hebrew, Spanish, Arabic, Japanese, etc.)", "")
-
-    if st.button("Reflect"):
-        if user_input.strip():
-            results, details = process_sentence(user_input)
+def process_text(text, mapping):
+    """Process text into words and classify each into harmonic categories."""
+    words = re.findall(r'\b\w+\b', text)
+    classified_words = []
+    
+    for word in words:
+        category = classify_word(word, mapping)
+        if category:
+            classified_words.append((word, category))
             
-            # Display Results
-            st.markdown("#### 📊 Harmonic Signature:")
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Category A (Symbolic)", results['A'])
-            col2.metric("Category B (Emotional)", results['B'])
-            col3.metric("Category C (Physical)", results['C'])
+    return classified_words
+
+# ==========================================
+# 2. PROBABILITY & DESERVEANCE MONITOR
+# ==========================================
+
+class ProbabilityMonitor:
+    def __init__(self):
+        self.expectation_score = 5.0  # Scale of 1-10
+        self.deserveance_score = 5.0   # Scale of 1-10
+        self.coherence_threshold = 0.75
+
+    def update_scores(self, expectation, deserveance):
+        self.expectation_score = expectation
+        self.deserveance_score = deserveance
+
+    def calculate_coherence(self):
+        # Coherence is maximized when expectation and deserveance are balanced
+        diff = abs(self.expectation_score - self.deserveance_score)
+        # Normalize difference to a 0-1 scale
+        coherence = 1.0 - (diff / 10.0)
+        return max(0.0, min(1.0, coherence))
+
+    def get_feedback(self):
+        coherence = self.calculate_coherence()
+        if coherence >= self.coherence_threshold:
+            return "✅ Coherence Stable. Your field is aligned for balanced recursion."
+        elif self.expectation_score > self.deserveance_score:
+            return "⚠️ High Expectation, Low Deserveance. You may be pulling from the field without offering reciprocal coherence."
+        else:
+            return "⚠️ Low Expectation, High Deserveance. You may be holding back your field's natural recursion due to self-doubt."
+
+# ==========================================
+# 3. ADJUSTMENT & INTEGRATION MODULES
+# ==========================================
+
+class AdjustmentModules:
+    @staticmethod
+    def apply_breath_calibration(coherence):
+        if coherence < 0.75:
+            return "🌬️ Breath Calibration Recommended: Take 3 slow, deep breaths. Inhale for 6s, hold for 3s, exhale for 6s."
+        return "✨ Breath Field Synchronized."
+
+    @staticmethod
+    def apply_symbolic_rephrasing(text, classified_words):
+        # Simple heuristic: if category 'B' (emotional/tension) dominates, suggest softening
+        b_count = sum(1 for _, cat in classified_words if cat == 'B')
+        total = len(classified_words) if classified_words else 1
+        if (b_count / total) > 0.4:
+            return "✍️ Symbolic Rephrasing Suggested: Try replacing emotionally charged words with neutral or reflective alternatives."
+        return "🔍 Symbolic Phrasing Balanced."
+
+    @staticmethod
+    def apply_harmonic_stabilization(coherence):
+        if coherence < 0.6:
+            return "🎵 Harmonic Stabilization Active: Play a 432Hz or 528Hz tone, or focus on a single geometric shape for 60 seconds."
+        return "🛡️ Harmonic Field Stable."
+
+# ==========================================
+# 4. STREAMLIT USER INTERFACE
+# ==========================================
+
+st.set_page_config(page_title="Harmonic Text Mirror", page_icon="🌀", layout="centered")
+
+st.title("🌀 Harmonic Text Mirror System")
+st.write("Explore the harmonic structure of your language through digital roots, breath coherence, and symbolic recursion.")
+
+# Language Selection
+language = st.selectbox("Select Language Mapping", ["English", "Hebrew"])
+mapping = ALPHABET_MAPPINGS[language]
+
+# Text Input
+user_text = st.text_area("Enter your text here:", height=150, placeholder="Type a sentence, a journal entry, or a mantra...")
+
+# Probability Expectance and Deserveance Monitor UI
+st.markdown("---")
+st.subheader("📊 Probability Expectance & Deserveance Monitor")
+st.write("Tune your inner field coherence before analyzing your text.")
+
+col1, col2 = st.columns(2)
+with col1:
+    expectation = st.slider("Your Expectation Level (1-10)", 1.0, 10.0, 5.0, 0.5, 
+                            help="How strongly do you expect a specific outcome or insight?")
+with col2:
+    deserveance = st.slider("Your Deserveance Level (1-10)", 1.0, 10.0, 5.0, 0.5, 
+                            help="How much do you feel you deserve or are ready to receive this outcome?")
+
+# Initialize Monitor
+monitor = ProbabilityMonitor()
+monitor.update_scores(expectation, deserveance)
+coherence_score = monitor.calculate_coherence()
+
+# Display Coherence Score
+st.metric(label="Field Coherence Score", value=f"{coherence_score:.2f}", 
+          delta="Stable" if coherence_score >= 0.75 else "Unbalanced", 
+          delta_color="normal" if coherence_score >= 0.75 else "inverse")
+
+st.info(monitor.get_feedback())
+
+# ==========================================
+# 5. ANALYSIS & VISUALIZATION
+# ==========================================
+
+if st.button("Mirror My Text"):
+    if user_text.strip():
+        classified = process_text(user_text, mapping)
+        
+        if classified:
+            st.markdown("---")
+            st.subheader("🔍 Harmonic Classification")
             
+            # Display classified words
+            cols = st.columns(3)
+            categories = {'A': [], 'B': [], 'C': []}
+            for word, cat in classified:
+                categories[cat].append(word)
+                
+            with cols[0]:
+                st.markdown("**Category A (3, 6, 9)**\n*Spirit / Breath*")
+                st.write(", ".join(categories['A']) if categories['A'] else "None")
+            with cols[1]:
+                st.markdown("**Category B (1, 4, 7)**\n*Emotion / Identity*")
+                st.write(", ".join(categories['B']) if categories['B'] else "None")
+            with cols[2]:
+                st.markdown("**Category C (2, 5, 8)**\n*Form / Structure*")
+                st.write(", ".join(categories['C']) if categories['C'] else "None")
+                
             # Visualization
+            st.subheader("📊 Harmonic Distribution")
+            counts = [len(categories['A']), len(categories['B']), len(categories['C'])]
+            labels = ['A (Spirit)', 'B (Emotion)', 'C (Form)']
+            colors = ['#9b5de5', '#f15bb5', '#00bbf9']
+            
             fig, ax = plt.subplots(figsize=(6, 4))
-            fig.patch.set_facecolor('#1a1a2e')
-            ax.set_facecolor('#1a1a2e')
-            
-            categories = ['A (Symbolic)', 'B (Emotional)', 'C (Physical)']
-            counts = [results['A'], results['B'], results['C']]
-            colors = ['#a080ff', '#ff80a0', '#80ffc0']
-            
-            bars = ax.bar(categories, counts, color=colors, edgecolor='#ffffff', linewidth=0.5)
-            ax.tick_params(colors='white')
-            ax.spines['bottom'].set_color('white')
-            ax.spines['left'].set_color('white')
-            ax.spines['top'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.set_title("Resonance Distribution", color='white', fontsize=12)
-            
-            # Add value labels on top of bars
-            for bar in bars:
-                yval = bar.get_height()
-                ax.text(bar.get_x() + bar.get_width()/2, yval + 0.1, str(yval), ha='center', va='bottom', color='white')
-            
+            ax.bar(labels, counts, color=colors)
+            ax.set_ylabel('Word Count')
+            ax.set_title('Harmonic Profile of Your Text')
             st.pyplot(fig)
             
-            # Word Breakdown
-            st.markdown("#### 🔍 Word-by-Word Breakdown:")
-            breakdown_text = ""
-            for word, cat in details:
-                color = "#a080ff" if cat == 'A' else "#ff80a0" if cat == 'B' else "#80ffc0"
-                breakdown_text += f"<span style='color:{color}; font-weight:bold;'>{word}</span> ({cat}) &nbsp;&nbsp;"
-            st.markdown(breakdown_text, unsafe_allow_index=True)
+            # Apply Adjustment and Integration Modules
+            st.markdown("---")
+            st.subheader("🛠️ Adjustment & Integration Modules")
+            
+            st.write(AdjustmentModules.apply_breath_calibration(coherence_score))
+            st.write(AdjustmentModules.apply_symbolic_rephrasing(user_text, classified))
+            st.write(AdjustmentModules.apply_harmonic_stabilization(coherence_score))
+            
         else:
-            st.warning("Please enter some text first.")
+            st.warning("No valid words found for classification. Try using more letters.")
+    else:
+        st.warning("Please enter some text to analyze.")
 
-# ================= TAB 2: HARMONIC CHARTER =================
-with tab2:
-    st.markdown("""
-    <div class='card'>
-    <h2>📜 The Harmonic Charter</h2>
-    <p><strong>1. Sovereignty of Expression:</strong> Every user owns their harmonic signature. No central authority may alter or suppress it.</p>
-    <p><strong>2. Privacy of Resonance:</strong> Text inputs and harmonic profiles are processed locally or ephemerally. No data is stored without explicit consent.</p>
-    <p><strong>3. Coherence Over Control:</strong> The system rewards balanced, coherent communication rather than engagement-driven noise.</p>
-    <p><strong>4. Open Access:</strong> The Harmonic Text Mirror is a public good. Its core algorithms and logic remain open-source and accessible to all.</p>
-    <p><strong>5. Interoperability:</strong> The system is designed to integrate seamlessly with decentralized identity, finance, and governance networks.</p>
-    </div>
-    """, unsafe_allow_index=True)
-
-# ================= TAB 3: TREASURY & TOKENOMICS =================
-with tab3:
-    st.markdown("""
-    <div class='card'>
-    <h2>💎 Harmonic Treasury & Tokenomics</h2>
-    <p>The <strong>Harmonic Treasury</strong> is a decentralized reserve that governs the distribution and utility of the ecosystem's native token.</p>
-    <h3>Token Functions:</h3>
-    <ul>
-        <li><strong>Reward:</strong> Earned by contributing coherent, balanced text to the ecosystem.</li>
-        <li><strong>Access:</strong> Used to unlock advanced harmonic analysis, premium content, or voting rights.</li>
-        <li><strong>Governance:</strong> Tokens represent voting power in the decentralized decision-making process.</li>
-    </ul>
-    <h3>Treasury Rules:</h3>
-    <ul>
-        <li>A fixed percentage of all transaction fees is routed to the Treasury.</li>
-        <li>Treasury funds are allocated via community-voted proposals.</li>
-        <li>No single entity holds administrative control over Treasury assets.</li>
-    </ul>
-    </div>
-    """, unsafe_allow_index=True)
-
-# ================= TAB 4: APPLICATIONS =================
-with tab4:
-    st.markdown("### 🚀 Functional Applications of the System")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        <div class='card'>
-        <h4>🎓 Education</h4>
-        <p>Gamified learning where students earn tokens for writing essays that demonstrate high harmonic coherence and balanced expression.</p>
-        </div>
-        <div class='card'>
-        <h4>💬 Social Media</h4>
-        <p>A platform that analyzes the emotional tone and harmonic balance of posts, rewarding constructive communication and discouraging toxicity.</p>
-        </div>
-        <div class='card'>
-        <h4>🛍️ Content Marketplace</h4>
-        <p>A decentralized store where creators price their work in tokens, and users pay to access articles, videos, or courses.</p>
-        </div>
-        """, unsafe_allow_index=True)
-        
-    with col2:
-        st.markdown("""
-        <div class='card'>
-        <h4>✍️ Collaborative Writing</h4>
-        <p>Real-time feedback for writers, suggesting adjustments to improve the symbolic, emotional, or physical balance of their text.</p>
-        </div>
-        <div class='card'>
-        <h4>🧘 Personal Development</h4>
-        <p>A journaling app that tracks the harmonic signature of daily entries, offering insights into emotional patterns and growth over time.</p>
-        </div>
-        <div class='card'>
-        <h4>🏛️ Decentralized Governance</h4>
-        <p>A voting system where voting weight is influenced by the historical coherence and harmonic contributions of the participant.</p>
-        </div>
-        """, unsafe_allow_index=True)
+st.markdown("---")
+st.caption("Harmonic Text Mirror System • Built with Streamlit • Powered by Codex Recursion Logic")
