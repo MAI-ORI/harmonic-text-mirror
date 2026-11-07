@@ -16,3 +16,7 @@ The **Harmonic Text Mirror** is a system that classifies words into three harmon
    ```bash
    git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
    cd YOUR_REPO_NAME
+git clone <your-repository-url>
+cd <your-repository-folder>
+pip install -r requirements.txt
+streamlit run app.py
