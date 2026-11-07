@@ -66,3 +66,28 @@ else:
     if st.button("Lock Session"):
         st.session_state.authenticated = False
         st.rerun()
+import streamlit as st
+from xrpl_integration import get_account_info
+
+st.title("Harmonic Text Mirror")
+
+# --- XRP Token Integration Section ---
+st.sidebar.header("✦ XRP Wallet Connection")
+wallet_address = st.sidebar.text_input("Enter your XRP Wallet Address:")
+
+if wallet_address:
+    st.sidebar.write("Connecting to XRP Ledger...")
+    account_data = get_account_info(wallet_address)
+    
+    if "error" in account_data:
+        st.sidebar.error("Invalid address or account not found.")
+    else:
+        balance_drops = int(account_data["account_data"]["Balance"])
+        balance_xrp = balance_drops / 1,000,000  # Convert drops to XRP
+        st.sidebar.success(f"Connected!")
+        st.sidebar.write(f"**Balance:** {balance_xrp:.2f} XRP")
+        
+        # Optional: Check for your custom token
+        # is_holder = verify_token_holder(wallet_address, "YOUR_TOKEN_CODE", "ISSUER_ADDRESS")
+        # if is_holder:
+        #     st.sidebar.write("✅ Harmonic Token Verified")
