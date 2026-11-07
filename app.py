@@ -1,3 +1,4 @@
+from harmonic_text_mapping import classify_word, get_digital_root
 import streamlit as st
 import requests
 from harmonic_text_mapping import word_value, classify_word, english_mapping
